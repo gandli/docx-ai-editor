@@ -1,0 +1,137 @@
+[
+  {
+    "timestamp": "2026-03-17T15:35:06.033Z",
+    "api": {
+      "p50": 63.1,
+      "p75": 73.74,
+      "p90": 77.18,
+      "p95": 77.35,
+      "p99": 80.17,
+      "avg": 59.28,
+      "min": 31.16,
+      "max": 80.17,
+      "iterations": 30,
+      "target": 100,
+      "passed": true
+    },
+    "build": {
+      "avg": 411.34,
+      "min": 403.92,
+      "max": 416.12,
+      "runs": 3,
+      "target": 5000,
+      "passed": true
+    },
+    "bundle": {
+      "error": "Command failed: find /Users/user/.openclaw/workspace/docx-ai-editor/dist/assets -type f -name \"*.js\" -o -name \"*.css\" 2>/dev/null",
+      "passed": false
+    },
+    "largeDoc": {
+      "wordCount": 10000,
+      "loadTimeMs": 1.29,
+      "chunksLoaded": 10,
+      "target": 500,
+      "passed": true
+    }
+  },
+  {
+    "timestamp": "2026-03-17T15:35:37.944Z",
+    "api": {
+      "p50": 56.18,
+      "p75": 70.74,
+      "p90": 79.17,
+      "p95": 80.15,
+      "p99": 81.18,
+      "avg": 55.65,
+      "min": 33,
+      "max": 81.18,
+      "iterations": 30,
+      "target": 100,
+      "passed": true
+    },
+    "build": {
+      "avg": 2343.74,
+      "min": 2249.49,
+      "max": 2396.93,
+      "runs": 3,
+      "target": 5000,
+      "passed": true
+    },
+    "bundle": {
+      "totalKB": 4663.48,
+      "totalBytes": 4775400,
+      "files": 14,
+      "fileSizes": {
+        "unified-Df6iltvW.es.CO99dQhM.js": 72,
+        "react-vendor.LwIL7iLM.js": 191756,
+        "index.CjP_ghVi.css": 29380,
+        "superdoc.es.TP5RnG0X.js": 140,
+        "PdfViewer-BuDakUuK.es.Da4ogTyc.js": 72,
+        "react-vendor.tevuj1oB.css": 60564,
+        "rehype-remark-CBHTrfcB.es.CJxpRenO.js": 72,
+        "superdoc-vendor.ChEfn3xr.js": 4329736,
+        "ai-vendor.BPGLZXXS.js": 123983,
+        "index.ToeM0yud.js": 38460,
+        "rolldown-runtime.ClXbbqP_.js": 949,
+        "rehype-parse-DBGL9UkS.es.BxgWYbEX.js": 72,
+        "remark-stringify-BMyimDcy.es.BPgUdOwD.js": 72,
+        "remark-gfm-CjV8kaUy.es.Zlhb2bOV.js": 72
+      },
+      "target": 500,
+      "passed": false
+    },
+    "largeDoc": {
+      "wordCount": 10000,
+      "loadTimeMs": 0.73,
+      "chunksLoaded": 10,
+      "target": 500,
+      "passed": true
+    }
+  },
+  {
+    "timestamp": "2026-03-17T15:36:22.776Z",
+    "api": {
+      "p50": 56.12,
+      "p75": 71.22,
+      "p90": 79.11,
+      "p95": 80.11,
+      "p99": 80.15,
+      "avg": 54.84,
+      "min": 33.09,
+      "max": 80.15,
+      "iterations": 30,
+      "target": 100,
+      "passed": true
+    },
+    "build": {
+      "avg": 615.79,
+      "min": 567.38,
+      "max": 650.84,
+      "runs": 3,
+      "target": 5000,
+      "passed": true
+    },
+    "bundle": {
+      "totalKB": 311.18,
+      "totalBytes": 318653,
+      "files": 6,
+      "fileSizes": {
+        "react-vendor.Ds9xuvdx.js": 187209,
+        "react-vendor.tevuj1oB.css": 60564,
+        "index.D00iYTSa.js": 38528,
+        "rolldown-runtime.BH_eKfjT.js": 559,
+        "ai-vendor.El-wbkbl.js": 3446,
+        "index.BAfteogD.css": 28347
+      },
+      "target": 500,
+      "passed": true
+    },
+    "largeDoc": {
+      "wordCount": 10000,
+      "loadTimeMs": 2.17,
+      "chunksLoaded": 10,
+      "target": 500,
+      "passed": true
+    }
+  }
+]
