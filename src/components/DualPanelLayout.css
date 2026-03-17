@@ -1,0 +1,293 @@
+.dual-panel-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.dual-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: width 0.3s ease, min-width 0.3s ease;
+  position: relative;
+}
+
+.dual-panel.no-transition {
+  transition: none;
+}
+
+.dual-panel.collapsed {
+  overflow: hidden;
+}
+
+.dual-panel.collapsed .panel-content {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 面板头部 */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.collapse-btn {
+  background: transparent;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #6c757d;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.collapse-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  color: #495057;
+}
+
+.collapse-btn:active {
+  background: #dee2e6;
+}
+
+/* 面板内容 */
+.panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+/* 调整手柄 */
+.resize-handle {
+  width: 8px;
+  height: 100%;
+  background: #f1f3f5;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.resize-handle:hover {
+  background: #e9ecef;
+}
+
+.resize-handle:hover .resize-grip {
+  opacity: 1;
+}
+
+.resize-grip {
+  width: 2px;
+  height: 40px;
+  background: #ced4da;
+  border-radius: 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+/* 调整中的状态 */
+.dual-panel-container.resizing .resize-handle {
+  background: #dee2e6;
+}
+
+.dual-panel-container.resizing .resize-grip {
+  background: #adb5bd;
+  opacity: 1;
+}
+
+/* 移动端切换器 */
+.mobile-panel-switcher {
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  z-index: 100;
+}
+
+.switch-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6c757d;
+  transition: all 0.2s;
+}
+
+.switch-btn.active {
+  background: #007bff;
+  color: white;
+}
+
+.switch-btn:hover:not(.active) {
+  background: #f8f9fa;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dual-panel-container {
+    flex-direction: column;
+  }
+
+  .dual-panel {
+    width: 100% !important;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .dual-panel.collapsed {
+    transform: translateX(-100%);
+  }
+
+  .right-panel.collapsed {
+    transform: translateX(100%);
+  }
+
+  .resize-handle {
+    display: none;
+  }
+
+  .mobile-panel-switcher {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .panel-header {
+    padding: 10px 12px;
+  }
+
+  .panel-title {
+    font-size: 13px;
+  }
+}
+
+/* 平板响应式 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .dual-panel-container {
+    flex-direction: row;
+  }
+
+  .mobile-panel-switcher {
+    display: none;
+  }
+
+  .resize-handle {
+    width: 6px;
+  }
+
+  .left-panel {
+    min-width: 50% !important;
+  }
+
+  .right-panel {
+    min-width: 40% !important;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .panel-header {
+    background: #2d3748;
+    border-bottom-color: #4a5568;
+  }
+
+  .panel-title {
+    color: #e2e8f0;
+  }
+
+  .collapse-btn {
+    border-color: #4a5568;
+    color: #a0aec0;
+  }
+
+  .collapse-btn:hover {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+  }
+
+  .resize-handle {
+    background: #2d3748;
+  }
+
+  .resize-handle:hover {
+    background: #4a5568;
+  }
+
+  .resize-grip {
+    background: #718096;
+  }
+
+  .mobile-panel-switcher {
+    background: #2d3748;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .switch-btn:hover:not(.active) {
+    background: #4a5568;
+  }
+}
+
+/* 无障碍支持 */
+.collapse-btn:focus,
+.switch-btn:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* 打印样式 */
+@media print {
+  .resize-handle,
+  .mobile-panel-switcher,
+  .collapse-btn {
+    display: none !important;
+  }
+
+  .dual-panel {
+    width: 50% !important;
+    position: static !important;
+    transform: none !important;
+  }
+}

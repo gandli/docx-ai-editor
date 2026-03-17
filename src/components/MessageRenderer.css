@@ -1,0 +1,253 @@
+/* 消息渲染器样式 */
+.message-renderer {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #212529;
+}
+
+/* 标题 */
+.heading-1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 24px 0 16px 0;
+  color: #1a1a1a;
+}
+
+.heading-2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 20px 0 12px 0;
+  color: #1a1a1a;
+}
+
+.heading-3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 16px 0 10px 0;
+  color: #1a1a1a;
+}
+
+.heading-4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 14px 0 8px 0;
+  color: #1a1a1a;
+}
+
+.heading-5 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 12px 0 6px 0;
+  color: #1a1a1a;
+}
+
+.heading-6 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 10px 0 4px 0;
+  color: #666;
+}
+
+/* 段落 */
+.markdown-paragraph {
+  margin: 12px 0;
+  word-wrap: break-word;
+}
+
+/* 代码块 */
+.code-block-wrapper {
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e1e;
+  border: 1px solid #333;
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #333;
+}
+
+.code-language {
+  font-size: 12px;
+  color: #888;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  text-transform: lowercase;
+}
+
+.copy-code-btn {
+  padding: 4px 10px;
+  background: #404040;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-code-btn:hover {
+  background: #505050;
+}
+
+.copy-code-btn:active {
+  transform: scale(0.98);
+}
+
+.code-block {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.code-block code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+/* 行内代码 */
+.inline-code {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  font-size: 13px;
+  color: #e83e8c;
+  border: 1px solid #e9ecef;
+}
+
+/* 列表 */
+.markdown-list {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.markdown-list li {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+/* 链接 */
+.markdown-link {
+  color: #0066cc;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.markdown-link:hover {
+  border-bottom-color: #0066cc;
+}
+
+/* 纯文本消息 */
+.plain-text-message {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+  .message-renderer {
+    color: #e2e8f0;
+  }
+
+  .heading-1,
+  .heading-2,
+  .heading-3,
+  .heading-4,
+  .heading-5 {
+    color: #f7fafc;
+  }
+
+  .heading-6 {
+    color: #a0aec0;
+  }
+
+  .inline-code {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #f687b3;
+  }
+
+  .markdown-link {
+    color: #63b3ed;
+  }
+
+  .markdown-link:hover {
+    border-bottom-color: #63b3ed;
+  }
+}
+
+/* 代码块语法高亮（基础） */
+.code-block .keyword {
+  color: #569cd6;
+}
+
+.code-block .string {
+  color: #ce9178;
+}
+
+.code-block .comment {
+  color: #6a9955;
+}
+
+.code-block .function {
+  color: #dcdcaa;
+}
+
+.code-block .number {
+  color: #b5cea8;
+}
+
+.code-block .operator {
+  color: #d4d4d4;
+}
+
+/* 滚动条 */
+.code-block::-webkit-scrollbar {
+  height: 8px;
+}
+
+.code-block::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.code-block::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+}
+
+.code-block::-webkit-scrollbar-thumb:hover {
+  background: #505050;
+}
+
+/* 复制成功动画 */
+@keyframes copySuccess {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.copy-code-btn.copied {
+  animation: copySuccess 0.3s ease;
+}

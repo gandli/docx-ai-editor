@@ -1,0 +1,160 @@
+.file-upload-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.file-dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  position: relative;
+}
+
+.file-dropzone:hover {
+  border-color: #007bff;
+  background: #f0f7ff;
+}
+
+.file-dropzone.drag-active {
+  border-color: #007bff;
+  background: #e6f2ff;
+  border-style: solid;
+  transform: scale(1.02);
+}
+
+.file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.upload-text h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.upload-text p {
+  margin: 0 0 4px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.file-type-hint {
+  color: #999 !important;
+  font-size: 12px !important;
+  margin-top: 8px !important;
+}
+
+.browse-button {
+  margin-top: 16px;
+  padding: 10px 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.browse-button:hover {
+  background: #0056b3;
+}
+
+.browse-button:active {
+  transform: scale(0.98);
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c53030;
+  font-size: 14px;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+/* 可访问性 */
+.file-dropzone:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.file-dropzone:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.file-dropzone:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .file-upload-container {
+    padding: 12px;
+  }
+
+  .file-dropzone {
+    padding: 30px 16px;
+  }
+
+  .upload-icon {
+    font-size: 36px;
+  }
+
+  .upload-text h3 {
+    font-size: 16px;
+  }
+
+  .upload-text p {
+    font-size: 13px;
+  }
+}

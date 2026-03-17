@@ -1,0 +1,95 @@
+.model-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--surface-1, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e9ecef);
+}
+
+.model-selector-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #212529);
+}
+
+.model-selector-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.model-selector {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--border-color, #dee2e6);
+  border-radius: 6px;
+  background: var(--surface-0, #ffffff);
+  color: var(--text-primary, #212529);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.model-selector:hover:not(:disabled) {
+  border-color: var(--primary-color, #007bff);
+}
+
+.model-selector:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.model-selector:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--surface-1, #f8f9fa);
+}
+
+.model-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6c757d);
+}
+
+.model-context {
+  padding: 0.25rem 0.5rem;
+  background: var(--surface-0, #ffffff);
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #dee2e6);
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .model-selector-container {
+    background: var(--surface-1, #2d3748);
+    border-color: var(--border-color, #4a5568);
+  }
+
+  .model-selector-label {
+    color: var(--text-primary, #f7fafc);
+  }
+
+  .model-selector {
+    background: var(--surface-0, #1a202c);
+    border-color: var(--border-color, #4a5568);
+    color: var(--text-primary, #f7fafc);
+  }
+
+  .model-selector:focus {
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+  }
+
+  .model-info {
+    color: var(--text-secondary, #a0aec0);
+  }
+
+  .model-context {
+    background: var(--surface-0, #1a202c);
+    border-color: var(--border-color, #4a5568);
+  }
+}

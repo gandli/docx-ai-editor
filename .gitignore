@@ -3,3 +3,22 @@ dist/
 .env
 *.log
 .DS_Store
+
+# Testing
+coverage/
+*.lcov
+.coverage
+
+# Autoresearch
+autoresearch-results.tsv
+ship/
+security/
+
+# Benchmarks
+*.benchmark.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
