@@ -1,6 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   validateDocxFile,
@@ -151,26 +148,20 @@ describe('docx-utils 导出功能', () => {
     it('应该成功触发下载', () => {
       const mockBlob = createMockBlob('download content')
       
-      // 模拟 document.createElement 和 document.body
+      // 在 it 块内部创建真实的 link 元素
       const mockLink = {
         click: vi.fn(),
         href: '',
         download: ''
       }
-      const originalBody = document.body
-      const mockBody = {
-        appendChild: vi.fn(() => {}),
-        removeChild: vi.fn(() => {})
-      }
       
-      const createElementSpy = vi.spyOn(document, 'createElement').mockImplementation(() => mockLink)
-      
-      // 临时替换 document.body
-      Object.defineProperty(document, 'body', {
-        value: mockBody,
-        writable: true,
-        configurable: true
-      })
+      const createElementSpy = vi.spyOn(document, 'createElement')
+        .mockImplementation((tag) => {
+          if (tag === 'a') {
+            return mockLink
+          }
+          return document.createElement(tag)
+        })
 
       const result = downloadBlob(mockBlob, 'test.docx')
 
@@ -178,13 +169,7 @@ describe('docx-utils 导出功能', () => {
       expect(createElementSpy).toHaveBeenCalledWith('a')
       expect(mockLink.click).toHaveBeenCalled()
 
-      // 恢复
       createElementSpy.mockRestore()
-      Object.defineProperty(document, 'body', {
-        value: originalBody,
-        writable: true,
-        configurable: true
-      })
     })
 
     it('应该拒绝空 blob', () => {
