@@ -43,8 +43,12 @@ export default defineConfig(({ mode }) => {
           },
           // 为外部依赖配置 CDN
           paths: (id) => {
-            if (id === 'superdoc' || id.startsWith('@superdoc-dev/')) {
-              return `https://esm.sh/${id}@1.18.2`
+            if (id === 'superdoc') {
+              return 'https://esm.sh/superdoc@1.18.2'
+            }
+
+            if (id === '@superdoc-dev/react') {
+              return 'https://esm.sh/@superdoc-dev/react@1.0.0-rc.2'
             }
           },
           entryFileNames: 'assets/[name].[hash].js',
