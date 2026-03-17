@@ -4,20 +4,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ExportPanel } from '../ExportPanel'
 import * as docxUtils from '../../api/docx-utils'
 
-// 模拟 docx-utils
-vi.mock('../../api/docx-utils', () => ({
-  exportDocxDocument: vi.fn(),
-  downloadBlob: vi.fn(),
-  previewDocxContent: vi.fn(),
-  formatFileSize: vi.fn((bytes) => `${(bytes / 1024 / 1024).toFixed(2)} MB`),
-  ExportError: {
-    EDITOR_NOT_READY: 'EDITOR_NOT_READY',
-    EXPORT_FAILED: 'EXPORT_FAILED',
-    FILE_TOO_LARGE: 'FILE_TOO_LARGE',
-    CANCELLED: 'CANCELLED',
-    UNKNOWN: 'UNKNOWN'
+// 模拟 docx-utils 的特定函数
+vi.mock('../../api/docx-utils', () => {
+  return {
+    exportDocxDocument: vi.fn(),
+    downloadBlob: vi.fn(),
+    previewDocxContent: vi.fn(),
+    formatFileSize: (bytes) => {
+      if (bytes === 0) return '0 B'
+      const k = 1024
+      const sizes = ['B', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    },
+    ExportError: {
+      EDITOR_NOT_READY: 'EDITOR_NOT_READY',
+      EXPORT_FAILED: 'EXPORT_FAILED',
+      FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+      CANCELLED: 'CANCELLED',
+      UNKNOWN: 'UNKNOWN'
+    }
   }
-}))
+})
 
 describe('ExportPanel 组件', () => {
   const mockEditorRef = {
