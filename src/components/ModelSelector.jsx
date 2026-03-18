@@ -25,7 +25,7 @@ export function ModelSelector({
   return (
     <div className="model-selector-container" data-testid="model-selector">
       <label htmlFor="model-select" className="model-selector-label">
-        AI 模型
+        选择 AI 模型
       </label>
       <div className="model-selector-wrapper">
         <select
