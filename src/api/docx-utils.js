@@ -185,7 +185,7 @@ export async function extractTextFromDocx(file) {
       }
       
       // Use mammoth to extract text from the DOCX file
-      const docxResult = await mammoth.default.extractRawText({ arrayBuffer: arrayBuffer })
+      const docxResult = await mammoth.extractRawText({ arrayBuffer: arrayBuffer })
       result = docxResult.value || ''
     } catch (mammothError) {
       console.warn('Mammoth.js failed to parse DOCX, falling back to basic extraction:', mammothError.message)
@@ -258,7 +258,7 @@ async function extractLargeDocument(file, chunkSize = 5 * 1024 * 1024) {
     const arrayBuffer = await file.arrayBuffer()
     
     // Use mammoth to extract text from the DOCX file
-    const docxResult = await mammoth.default.extractRawText({ arrayBuffer: arrayBuffer })
+    const docxResult = await mammoth.extractRawText({ arrayBuffer: arrayBuffer })
     return docxResult.value || ''
   } catch (error) {
     console.warn('Mammoth.js failed for large document, falling back to basic extraction:', error.message)
