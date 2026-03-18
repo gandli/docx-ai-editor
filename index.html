@@ -3,46 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DOCX AI Editor</title>
+  <title>采购文档审查工作台</title>
   <script type="module" src="/src/main.jsx"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
-    .app { display: flex; height: 100vh; }
-    .document-panel { flex: 1; border-right: 1px solid #e0e0e0; background: white; padding: 20px; overflow: auto; }
-    .chat-panel { width: 400px; background: #fafafa; display: flex; flex-direction: column; }
-    header { padding: 16px; background: #fff; border-bottom: 1px solid #e0e0e0; }
-    h1 { color: #1976d2; font-size: 24px; margin: 0; }
-    .placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: #666; }
-    .chat-messages { flex: 1; padding: 16px; overflow-y: auto; }
-    .message { margin-bottom: 12px; padding: 8px; border-radius: 4px; }
-    .message.user { background: #e3f2fd; }
-    .message.ai { background: #f1f8e9; }
-    .chat-input { padding: 16px; border-top: 1px solid #e0e0e0; }
-    input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-    button { padding: 8px 16px; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 8px; }
-    button:disabled { background: #ccc; cursor: not-allowed; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: #f5f5f5; 
+      height: 100vh;
+      overflow: hidden;
+    }
+    #root { 
+      height: 100vh; 
+      width: 100vw;
+    }
+    /* 初始加载占位 */
+    .initial-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .initial-loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #1976d2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="document-panel">
-      <header>
-        <h1>DOCX AI Editor</h1>
-      </header>
-      <div class="placeholder">加载中...</div>
-    </div>
-    <div class="chat-panel">
-      <header>
-        <h1>AI 助手</h1>
-      </header>
-      <div class="chat-messages">
-        <div class="message ai">欢迎使用 DOCX AI Editor！请上传 DOCX 文件开始。</div>
-      </div>
-      <div class="chat-input">
-        <input type="text" placeholder="跟 AI 交流，优化文档..." />
-        <button>发送</button>
-      </div>
+  <div id="root">
+    <div class="initial-loader">
+      <div class="initial-loader-spinner"></div>
+      <p>正在启动审查工作台...</p>
     </div>
   </div>
 </body>
