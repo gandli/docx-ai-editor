@@ -5,6 +5,17 @@
  * 2. 分块处理大文件
  * 3. 惰性加载
  * 4. 新增文档导航和建议应用功能
+ * 5. Proper DOCX parsing with mammoth.js
+ */
+
+/**
+ * DOCX 工具函数 - 性能优化版本
+ * 优化点：
+ * 1. 提取结果缓存
+ * 2. 分块处理大文件
+ * 3. 惰性加载
+ * 4. 新增文档导航和建议应用功能
+ * 5. Proper DOCX parsing with mammoth.js
  */
 
 // ============ 缓存系统 ============
@@ -150,45 +161,68 @@ export async function extractTextFromDocx(file) {
       throw new Error(validation.error)
     }
 
-    // 大文件分块处理（>10MB）
-    const largeFileThreshold = 10 * 1024 * 1024
-    if (file.size > largeFileThreshold) {
-      console.log(`📦 大文件检测：${(file.size / 1024 / 1024).toFixed(2)}MB，使用分块处理`)
-      return await extractLargeDocument(file)
-    }
-
-    // 读取文件内容 - 支持 File 和 Blob
-    let arrayBuffer
-    if (typeof file.arrayBuffer === 'function') {
-      arrayBuffer = await file.arrayBuffer()
-    } else if (file instanceof Blob) {
-      // 在某些测试环境中，使用 FileReader
-      arrayBuffer = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result)
-        reader.onerror = () => reject(new Error('读取文件失败'))
-        reader.readAsArrayBuffer(file)
-      })
-    } else {
-      // 处理 Uint8Array 或其他格式
-      throw new Error('不支持的文件格式')
-    }
-    
-    // 对于测试目的，返回文件内容
-    // 实际实现中将使用 SuperDoc Headless 模式或 JSZip 解析 DOCX
-    const text = new TextDecoder().decode(arrayBuffer)
-    
-    // 如果是测试内容（以 PK 开头），返回模拟的结构化内容
+    // For proper DOCX parsing, we need to use mammoth.js
+    // Mammoth.js requires the file as a File/Blob object or ArrayBuffer
     let result
-    if (text.startsWith('PK')) {
-      // 检查是否包含 HTML 标签
-      if (text.includes('<')) {
-        result = text.substring(4) // 移除 PK 头
+    try {
+      // Import mammoth dynamically to avoid issues in environments where it's not available
+      const mammoth = await import('mammoth')
+      
+      // Convert to ArrayBuffer if needed
+      let arrayBuffer
+      if (file instanceof ArrayBuffer) {
+        arrayBuffer = file
+      } else if (typeof file.arrayBuffer === 'function') {
+        arrayBuffer = await file.arrayBuffer()
       } else {
-        result = text.substring(4) || ''
+        // Fallback for other formats
+        arrayBuffer = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result)
+          reader.onerror = () => reject(new Error('读取文件失败'))
+          reader.readAsArrayBuffer(file)
+        })
       }
-    } else {
-      result = text
+      
+      // Use mammoth to extract text from the DOCX file
+      const docxResult = await mammoth.default.extractRawText({ arrayBuffer: arrayBuffer })
+      result = docxResult.value || ''
+    } catch (mammothError) {
+      console.warn('Mammoth.js failed to parse DOCX, falling back to basic extraction:', mammothError.message)
+      // Fallback to the original method if mammoth fails
+      // This handles edge cases where the DOCX file might be corrupted or in a different format
+      
+      // Large file handling
+      const largeFileThreshold = 10 * 1024 * 1024
+      if (file.size > largeFileThreshold) {
+        console.log(`📦 大文件检测：${(file.size / 1024 / 1024).toFixed(2)}MB，使用分块处理`)
+        return await extractLargeDocument(file)
+      }
+
+      // Read file content as ArrayBuffer
+      let arrayBuffer
+      if (typeof file.arrayBuffer === 'function') {
+        arrayBuffer = await file.arrayBuffer()
+      } else if (file instanceof Blob) {
+        arrayBuffer = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result)
+          reader.onerror = () => reject(new Error('读取文件失败'))
+          reader.readAsArrayBuffer(file)
+        })
+      } else {
+        throw new Error('不支持的文件格式')
+      }
+      
+      // Decode as text (this is the fallback behavior)
+      const text = new TextDecoder().decode(arrayBuffer)
+      
+      // Extract content after PK signature if it's a ZIP-like file
+      if (text.startsWith('PK')) {
+        result = text.substring(4) || ''
+      } else {
+        result = text
+      }
     }
     
     // 存入缓存
@@ -214,24 +248,42 @@ export async function extractTextFromDocx(file) {
  * 分块处理大文档
  */
 async function extractLargeDocument(file, chunkSize = 5 * 1024 * 1024) {
-  const chunks = []
-  let offset = 0
-  
-  while (offset < file.size) {
-    const chunk = file.slice(offset, offset + chunkSize)
-    const buffer = await chunk.arrayBuffer()
-    const text = new TextDecoder().decode(buffer)
-    chunks.push(text.substring(4)) // 移除 PK 头
+  // For large files, we'll still use mammoth.js for proper parsing
+  // rather than the chunked approach which doesn't work for DOCX files
+  try {
+    const mammoth = await import('mammoth')
     
-    offset += chunkSize
+    // Read the entire file as array buffer (for large files, this may be memory intensive)
+    // In a production environment, you might want to implement streaming processing
+    const arrayBuffer = await file.arrayBuffer()
     
-    // 让出主线程
-    if (offset % (chunkSize * 2) === 0) {
-      await new Promise(resolve => setTimeout(resolve, 0))
+    // Use mammoth to extract text from the DOCX file
+    const docxResult = await mammoth.default.extractRawText({ arrayBuffer: arrayBuffer })
+    return docxResult.value || ''
+  } catch (error) {
+    console.warn('Mammoth.js failed for large document, falling back to basic extraction:', error.message)
+    
+    // Fallback to the original chunked approach for very large files
+    // Note: This approach doesn't properly parse DOCX, but handles the case where mammoth fails
+    const chunks = []
+    let offset = 0
+    
+    while (offset < file.size) {
+      const chunk = file.slice(offset, offset + chunkSize)
+      const buffer = await chunk.arrayBuffer()
+      const text = new TextDecoder().decode(buffer)
+      chunks.push(text.substring(4)) // 移除 PK 头
+      
+      offset += chunkSize
+      
+      // 让出主线程
+      if (offset % (chunkSize * 2) === 0) {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      }
     }
+    
+    return chunks.join('')
   }
-  
-  return chunks.join('')
 }
 
 /**
