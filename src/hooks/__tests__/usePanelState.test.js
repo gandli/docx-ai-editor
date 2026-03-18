@@ -271,12 +271,12 @@ describe('usePanelState', () => {
       const { result } = renderHook(() => usePanelState())
       
       act(() => {
-        result.current.onResize({ leftWidth: 65 })
+        result.current.onResize({ leftWidth: 80 })
       })
       
       expect(localStorageMock.setItem).toHaveBeenCalled()
       const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1])
-      expect(savedData.leftWidth).toBe(65)
+      expect(savedData.leftWidth).toBe(80)
     })
 
     it('禁用持久化时不保存', () => {

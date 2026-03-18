@@ -107,7 +107,7 @@ describe('useChatCommands', () => {
       
       expect(mockSendMessage).toHaveBeenCalled()
       const callArgs = mockSendMessage.mock.calls[0][0]
-      expect(callArgs).toContain('5 个关键要点')
+      expect(callArgs).toContain('列出5个关键要点')
     })
   })
 

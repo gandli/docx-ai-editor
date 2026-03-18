@@ -31,6 +31,11 @@ describe('useLLM', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     isApiKeyConfigured.mockReturnValue(true)
+    // Reset analyzeDocumentStreamFromFile to default success behavior
+    analyzeDocumentStreamFromFile.mockResolvedValue({
+      textStream: (async function* () { yield 'Hello'; yield ' World' })(),
+      text: () => Promise.resolve('Hello World')
+    })
   })
 
   afterEach(() => {
@@ -135,12 +140,17 @@ describe('useLLM', () => {
       
       const mockFile = new File(['test'], 'test.docx')
       
-      await expect(
-        act(async () => {
+      let thrownError = null
+      await act(async () => {
+        try {
           await result.current.streamAnalyze(mockFile, 'Test')
-        })
-      ).rejects.toThrow('OpenRouter API 密钥未配置')
+        } catch (err) {
+          thrownError = err
+        }
+      })
       
+      expect(thrownError).toBeTruthy()
+      expect(thrownError.message).toBe('OpenRouter API 密钥未配置')
       expect(result.current.error).toBe('OpenRouter API 密钥未配置')
     })
 
@@ -167,12 +177,17 @@ describe('useLLM', () => {
       
       const mockFile = new File(['test'], 'test.docx')
       
-      await expect(
-        act(async () => {
+      let thrownError = null
+      await act(async () => {
+        try {
           await result.current.streamAnalyze(mockFile, 'Test')
-        })
-      ).rejects.toThrow('API error')
+        } catch (err) {
+          thrownError = err
+        }
+      })
       
+      expect(thrownError).toBeTruthy()
+      expect(thrownError.message).toBe('API error')
       expect(result.current.error).toBe('API error')
       expect(result.current.isLoading).toBe(false)
     })
@@ -180,15 +195,26 @@ describe('useLLM', () => {
 
   describe('cancel', () => {
     it('取消当前请求', async () => {
-      // 创建一个不会立即完成的流
-      analyzeDocumentStreamFromFile.mockImplementation(() => {
-        return new Promise((resolve) => {
+      // 创建一个可控的 abort 场景
+      let abortSignal
+      analyzeDocumentStreamFromFile.mockImplementation((file, prompt, model, signal) => {
+        abortSignal = signal
+        return new Promise((resolve, reject) => {
+          const checkAbort = setInterval(() => {
+            if (signal?.aborted) {
+              clearInterval(checkAbort)
+              reject(new DOMException('Aborted', 'AbortError'))
+            }
+          }, 10)
+          
+          // 长时间运行的任务
           setTimeout(() => {
+            clearInterval(checkAbort)
             resolve({
               textStream: (async function* () { yield 'Test' })(),
               text: () => Promise.resolve('Test')
             })
-          }, 1000)
+          }, 5000)
         })
       })
       
@@ -196,12 +222,12 @@ describe('useLLM', () => {
       
       const mockFile = new File(['test'], 'test.docx')
       
-      // 开始分析
-      const analyzePromise = act(async () => {
-        return result.current.streamAnalyze(mockFile, 'Test')
+      // 开始分析（不等待完成）
+      act(() => {
+        result.current.streamAnalyze(mockFile, 'Test').catch(() => {})
       })
       
-      // 等待开始加载
+      // 等待加载状态变为 true
       await waitFor(() => {
         expect(result.current.isLoading).toBe(true)
       })
@@ -211,21 +237,22 @@ describe('useLLM', () => {
         result.current.cancel()
       })
       
+      // 验证取消后的状态
       expect(result.current.isLoading).toBe(false)
       expect(result.current.error).toBe('请求已取消')
-      
-      // 清理
-      await analyzePromise.catch(() => {})
     })
 
     it('当没有进行中的请求时不执行操作', () => {
       const { result } = renderHook(() => useLLM())
       
-      expect(() => {
-        act(() => {
-          result.current.cancel()
-        })
-      }).not.toThrow()
+      // 直接调用 cancel 不应该抛出错误
+      act(() => {
+        result.current.cancel()
+      })
+      
+      // 验证状态未改变
+      expect(result.current.isLoading).toBe(false)
+      expect(result.current.error).toBe(null)
     })
   })
 
@@ -238,7 +265,11 @@ describe('useLLM', () => {
       const mockFile = new File(['test'], 'test.docx')
       
       await act(async () => {
-        await result.current.streamAnalyze(mockFile, 'Test').catch(() => {})
+        try {
+          await result.current.streamAnalyze(mockFile, 'Test')
+        } catch {
+          // 忽略错误
+        }
       })
       
       expect(result.current.error).toBe('Test error')
