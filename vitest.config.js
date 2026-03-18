@@ -26,7 +26,7 @@ export default defineConfig({
         }
       }
     },
-    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}', 'tests/**/*.{test,spec}.{js,jsx,ts,tsx}'],
     reporters: ['verbose'],
     server: {
       deps: {
