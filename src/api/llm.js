@@ -1,5 +1,6 @@
 // LLM API 集成 - OpenRouter 多模型支持
 import { extractTextFromDocx } from './docx-utils'
+import { runMockReview } from './mock-ai-review.js'
 
 // OpenRouter API 配置
 const OPENROUTER_BASE_URL = import.meta.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1'
@@ -152,10 +153,57 @@ export async function callLLM({
  * @param {File} docxFile - DOCX 文件
  * @param {string} userPrompt - 用户提示
  * @param {string} selectedModel - 选中的模型
+ * @param {boolean} useMock - 是否使用模拟模式
  * @returns {Promise<string>} AI 响应文本
  */
-export async function analyzeDocument(docxFile, userPrompt, selectedModel = DEFAULT_MODEL) {
+export async function analyzeDocument(docxFile, userPrompt, selectedModel = DEFAULT_MODEL, useMock = false) {
   try {
+    // 如果启用模拟模式，返回模拟响应
+    if (useMock) {
+      // For now, return a basic mock response. In a more sophisticated implementation,
+      // we might need to extract text and generate more context-aware mock findings.
+      const mockResponse = {
+        summary: '基于文档内容的AI分析结果（模拟模式）',
+        findings: [
+          {
+            id: 'mock-finding-1',
+            type: 'style_suggestion',
+            severity: 'medium',
+            title: '文档结构建议',
+            description: '文档整体结构良好，建议保持当前的组织方式。',
+            suggestions: [
+              '保持段落间的逻辑连贯性',
+              '适当使用标题层级来组织内容',
+              '考虑添加摘要部分'
+            ],
+            context: '文档整体',
+            status: 'open',
+            category: 'structure',
+            priority: 1
+          },
+          {
+            id: 'mock-finding-2',
+            type: 'content_issue',
+            severity: 'low',
+            title: '表达优化建议',
+            description: '某些句子可以更加简洁明了。',
+            suggestions: [
+              '简化复杂的句子结构',
+              '使用更精确的词汇',
+              '保持一致的语调'
+            ],
+            context: '文档正文',
+            status: 'open',
+            category: 'style',
+            priority: 0
+          }
+        ],
+        suggestions: ['考虑添加图表来辅助说明', '优化段落开头的过渡']
+      };
+      
+      return JSON.stringify(mockResponse);
+    }
+    
     // 1. 提取 DOCX 文本内容
     const docxText = await extractTextFromDocx(docxFile)
     
@@ -187,6 +235,26 @@ export async function analyzeDocument(docxFile, userPrompt, selectedModel = DEFA
     
   } catch (error) {
     console.error('LLM API error:', error)
+    // 如果是在模拟模式下出现错误，返回安全的模拟响应而不是抛出错误
+    if (useMock) {
+      return JSON.stringify({
+        summary: '模拟模式运行（API不可用）',
+        findings: [{
+          id: 'mock-error-fallback',
+          type: 'informational',
+          severity: 'low',
+          title: '模拟模式说明',
+          description: '由于未配置API密钥，系统当前运行在模拟模式下。真实环境中将提供AI驱动的详细分析。',
+          suggestions: ['配置OpenRouter API密钥以获得真实AI分析结果'],
+          context: '系统状态',
+          status: 'open',
+          category: 'information',
+          priority: 0
+        }],
+        suggestions: ['配置有效的API密钥以获得真实分析结果']
+      });
+    }
+    // 如果不是在模拟模式下，抛出错误以便上层处理
     throw error
   }
 }
