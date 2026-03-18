@@ -3,7 +3,7 @@ import { AppShell } from './app/AppShell';
 import { runReviewSession } from './domains/review/services/review-orchestrator';
 import { parseFileToDocument } from './api/document-parser';
 import { defaultRules } from './domains/review/model/review-models';
-import { analyzeDocument } from './api/llm';
+import { analyzeDocument, isApiKeyConfigured } from './api/llm';
 import './App.css';
 
 /**
@@ -39,14 +39,19 @@ function App() {
       setSelectedFinding(null);
       setReport(null);
       
+      // Determine if we should use mock mode based on API key configuration
+      const useMockMode = !isApiKeyConfigured();
+      
       // Now run the review session with the parsed document
-      console.log('Running review session...');
+      console.log('Running review session...', { useMockMode });
       const reviewResult = await runReviewSession({
         document: parsedDocument,
         rules: defaultRules,
-        aiReviewer: async (doc) => {
+        useMock: useMockMode,
+        aiReviewer: async (doc, mockMode = useMockMode) => {
           // Use the analyzeDocument function to get AI review
-          const aiResponse = await analyzeDocument(file, '请审查此文档并指出任何问题或改进建议');
+          // Pass the mockMode flag to determine whether to use mock implementation
+          const aiResponse = await analyzeDocument(file, '请审查此文档并指出任何问题或改进建议', undefined, mockMode);
           return aiResponse;
         }
       });
@@ -56,8 +61,23 @@ function App() {
       
     } catch (error) {
       console.error('File upload or processing error:', error);
-      // Still clear findings on error but show error state if needed
-      setFindings([]);
+      // Show a user-friendly error message in the UI
+      setFindings([{
+        id: 'error-finding',
+        type: 'system_error',
+        severity: 'high',
+        title: '文档处理失败',
+        description: `处理文档时发生错误: ${error.message || '未知错误'}`,
+        suggestions: [
+          '请检查文件格式是否正确',
+          '确保您已配置有效的AI API密钥',
+          '如需离线使用，请注意当前为模拟模式'
+        ],
+        context: '文档处理',
+        status: 'open',
+        category: 'system',
+        priority: 2
+      }]);
       setSelectedFinding(null);
       setReport(null);
     } finally {
