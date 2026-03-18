@@ -108,6 +108,38 @@ export const FIXTURES = {
     expectedFindings: 1,
     expectedSeverity: 'high',
     expectedFindingType: 'incomplete_timeline'
+  },
+  emergencyProcurement: {
+    filename: 'emergency-procurement.docx',
+    description: 'Emergency procurement with expedited timeline - tests emergency compliance rules',
+    expectedFindings: 2,
+    expectedSeverity: 'high',
+    expectedFindingTypes: ['emergency_justification_insufficient', 'accelerated_timeline_risk'],
+    tags: ['emergency', 'compliance', 'risk']
+  },
+  multiVendorBid: {
+    filename: 'multi-vendor-bid.docx',
+    description: 'Multi-vendor bidding process document - tests consortium and coordination rules',
+    expectedFindings: 1,
+    expectedSeverity: 'medium',
+    expectedFindingTypes: ['consortium_agreement_incomplete'],
+    tags: ['multi-vendor', 'consortium', 'coordination']
+  },
+  internationalSupplier: {
+    filename: 'international-supplier.docx',
+    description: 'International supplier with currency/translation issues - tests cross-border compliance',
+    expectedFindings: 3,
+    expectedSeverity: 'high',
+    expectedFindingTypes: ['foreign_exchange_compliance', 'import_approval_missing', 'currency_risk'],
+    tags: ['international', 'currency', 'compliance']
+  },
+  highValueContract: {
+    filename: 'high-value-contract.docx',
+    description: 'High-value contract requiring additional approvals - tests budget and authority rules',
+    expectedFindings: 2,
+    expectedSeverity: 'high',
+    expectedFindingTypes: ['budget_verification_needed', 'approval_documentation_incomplete'],
+    tags: ['high-value', 'budget', 'approval']
   }
 };
 
@@ -118,3 +150,45 @@ export function getAllFixtures() {
     file: loadFixtureFile(fixture.filename)
   }));
 }
+
+// Helper to get fixtures by tag
+export function getFixturesByTag(tag) {
+  return Object.values(FIXTURES)
+    .filter(fixture => fixture.tags?.includes(tag))
+    .map(fixture => ({
+      ...fixture,
+      file: loadFixtureFile(fixture.filename)
+    }));
+}
+
+// Helper to get fixtures by severity
+export function getFixturesBySeverity(severity) {
+  return Object.values(FIXTURES)
+    .filter(fixture => fixture.expectedSeverity === severity)
+    .map(fixture => ({
+      ...fixture,
+      file: loadFixtureFile(fixture.filename)
+    }));
+}
+
+// Demo scenarios mapping
+export const DEMO_SCENARIOS = {
+  budgetAnalysis: {
+    name: '预算分析审查',
+    description: '分析采购文档预算部分的合规性和风险',
+    documents: ['high-value-contract.docx', 'international-supplier.docx'],
+    exampleFile: 'docs/examples/budget-analysis-scenario.md'
+  },
+  complianceCheck: {
+    name: '合规性检查',
+    description: '全面检查采购文档的法规合规性',
+    documents: ['emergency-procurement.docx', 'international-supplier.docx', 'multi-vendor-bid.docx'],
+    exampleFile: 'docs/examples/compliance-check-scenario.md'
+  },
+  riskAssessment: {
+    name: '风险评估',
+    description: '识别和评估采购项目的各类风险',
+    documents: ['high-value-contract.docx', 'emergency-procurement.docx', 'international-supplier.docx', 'multi-vendor-bid.docx'],
+    exampleFile: 'docs/examples/risk-assessment-scenario.md'
+  }
+};
