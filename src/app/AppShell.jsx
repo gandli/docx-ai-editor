@@ -54,59 +54,47 @@ export function AppShell({
 
   // Render left panel content (Document)
   const renderDocumentPanel = () => {
-    if (!document) {
-      return (
-        <div className="upload-placeholder" data-testid="upload-placeholder">
-          <FileUpload onFileSelect={onFileUpload} disabled={isProcessing} />
-          <div className="upload-info">
-            <h3>上传采购文档</h3>
-            <p>支持 .docx 格式文件</p>
-            <p className="upload-tip">💡 上传后可进行智能审查</p>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="document-container" data-testid="document-container">
-        <div className="document-info">
-          <span className="document-name">{document.name}</span>
-          <div className="document-actions">
-            <button
-              className={`action-btn ${showChat ? 'active' : ''}`}
-              onClick={toggleChat}
-              title={showChat ? '隐藏聊天' : '显示聊天'}
-            >
-              💬
-            </button>
-            <button
-              className="clear-doc-btn"
-              onClick={onClearDocument}
-              title="清除文档"
-            >
-              ✕
-            </button>
+        {!document ? (
+          <div className="upload-placeholder" data-testid="upload-placeholder">
+            <FileUpload onFileSelect={onFileUpload} disabled={isProcessing} />
+            <div className="upload-info">
+              <h3>上传采购文档</h3>
+              <p>支持 .docx 格式文件</p>
+              <p className="upload-tip">💡 上传后可进行智能审查</p>
+            </div>
           </div>
-        </div>
-        <DocumentEditor document={document} disabled={isProcessing} />
+        ) : (
+          <>
+            <div className="document-info">
+              <span className="document-name">{document.name}</span>
+              <div className="document-actions">
+                <button
+                  className={`action-btn ${showChat ? 'active' : ''}`}
+                  onClick={toggleChat}
+                  title={showChat ? '隐藏聊天' : '显示聊天'}
+                >
+                  💬
+                </button>
+                <button
+                  className="clear-doc-btn"
+                  onClick={onClearDocument}
+                  title="清除文档"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <DocumentEditor document={document} disabled={isProcessing} />
+          </>
+        )}
       </div>
     );
   };
 
   // Render right panel content (Findings)
   const renderFindingsPanel = () => {
-    if (!document) {
-      return (
-        <div className="findings-placeholder" data-testid="findings-placeholder">
-          <div className="placeholder-content">
-            <div className="placeholder-icon">📋</div>
-            <h3>审查结果</h3>
-            <p>上传文档后将显示审查结果</p>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="findings-workspace" data-testid="findings-workspace">
         {/* Findings List */}
@@ -130,6 +118,17 @@ export function AppShell({
               onDismiss={onDismissFinding}
               onAccept={onAcceptFinding}
             />
+          </div>
+        )}
+
+        {/* Show empty state only when no document and no findings exist */}
+        {!document && findings.length === 0 && !selectedFinding && (
+          <div className="findings-placeholder" data-testid="findings-placeholder">
+            <div className="placeholder-content">
+              <div className="placeholder-icon">📋</div>
+              <h3>审查结果</h3>
+              <p>上传文档后将显示审查结果</p>
+            </div>
           </div>
         )}
       </div>
