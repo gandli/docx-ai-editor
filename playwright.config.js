@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
-  testDir: './__tests__/e2e',
+  testDir: './tests/e2e', // Point to the correct test directory where our new tests are
   timeout: 30000,
   expect: {
     timeout: 5000

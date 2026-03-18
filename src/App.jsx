@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { AppShell } from './app/AppShell';
 import { runReviewSession } from './domains/review/services/review-orchestrator';
 import { parseFileToDocument } from './api/document-parser';
 import { defaultRules } from './domains/review/model/review-models';
 import { analyzeDocument, isApiKeyConfigured } from './api/llm';
+import { isWebMCPAvailable, discoverWebMCPTools, invokeWebMCPTool } from './utils/webmcp-utils';
 import './App.css';
 
 /**
@@ -16,6 +17,30 @@ function App() {
   const [selectedFinding, setSelectedFinding] = useState(null);
   const [report, setReport] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [webMCPEnabled, setWebMCPEnabled] = useState(false);
+  const [webMCPTools, setWebMCPTools] = useState([]);
+
+  // Initialize WebMCP support
+  useEffect(() => {
+    const initWebMCP = async () => {
+      const available = await isWebMCPAvailable();
+      setWebMCPEnabled(available);
+      
+      if (available) {
+        try {
+          const tools = await discoverWebMCPTools();
+          setWebMCPTools(tools);
+          console.log('WebMCP initialized with tools:', tools);
+        } catch (error) {
+          console.error('Error discovering WebMCP tools:', error);
+        }
+      } else {
+        console.log('WebMCP not available in this environment');
+      }
+    };
+
+    initWebMCP();
+  }, []);
 
   // Handle file upload
   const handleFileUpload = useCallback(async (file) => {
@@ -42,19 +67,57 @@ function App() {
       // Determine if we should use mock mode based on API key configuration
       const useMockMode = !isApiKeyConfigured();
       
-      // Now run the review session with the parsed document
-      console.log('Running review session...', { useMockMode });
-      const reviewResult = await runReviewSession({
-        document: parsedDocument,
-        rules: defaultRules,
-        useMock: useMockMode,
-        aiReviewer: async (doc, mockMode = useMockMode) => {
-          // Use the analyzeDocument function to get AI review
-          // Pass the mockMode flag to determine whether to use mock implementation
-          const aiResponse = await analyzeDocument(file, '请审查此文档并指出任何问题或改进建议', undefined, mockMode);
-          return aiResponse;
+      // Check if WebMCP is available and preferred for this operation
+      let reviewResult;
+      if (webMCPEnabled && useMockMode) {
+        // If WebMCP is available and we're in mock mode, consider using WebMCP
+        try {
+          // Check if there's a document review tool available via WebMCP
+          const hasReviewTool = webMCPTools.some(tool => 
+            tool.name.includes('review') || tool.name.includes('analyze')
+          );
+          
+          if (hasReviewTool) {
+            console.log('Using WebMCP for document review');
+            // Find and use the review tool
+            const reviewTool = webMCPTools.find(tool => 
+              tool.name.includes('review') || tool.name.includes('analyze')
+            );
+            
+            if (reviewTool) {
+              const webMCPResult = await invokeWebMCPTool(reviewTool.name, {
+                document: parsedDocument,
+                task: 'procurement-document-review',
+                criteria: defaultRules
+              });
+              
+              // Transform WebMCP result to match our expected format
+              reviewResult = {
+                findings: webMCPResult.results || webMCPResult.findings || []
+              };
+            }
+          }
+        } catch (webMCPError) {
+          console.warn('WebMCP review failed, falling back to standard method:', webMCPError);
         }
-      });
+      }
+      
+      // If WebMCP wasn't used or failed, use the standard method
+      if (!reviewResult) {
+        // Now run the review session with the parsed document
+        console.log('Running review session...', { useMockMode });
+        reviewResult = await runReviewSession({
+          document: parsedDocument,
+          rules: defaultRules,
+          useMock: useMockMode,
+          aiReviewer: async (doc, mockMode = useMockMode) => {
+            // Use the analyzeDocument function to get AI review
+            // Pass the mockMode flag to determine whether to use mock implementation
+            const aiResponse = await analyzeDocument(file, '请审查此文档并指出任何问题或改进建议', undefined, mockMode);
+            return aiResponse;
+          }
+        });
+      }
       
       console.log('Review completed:', reviewResult);
       setFindings(reviewResult.findings);
@@ -83,7 +146,7 @@ function App() {
     } finally {
       setIsProcessing(false);
     }
-  }, []);
+  }, [webMCPEnabled, webMCPTools]);
 
   // Clear document
   const handleClearDocument = useCallback(() => {
