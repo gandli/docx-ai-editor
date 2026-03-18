@@ -67,22 +67,25 @@ if (rootElement) {
 
 // ============ 资源预加载 ============
 function preloadCriticalResources() {
-  // 预加载关键组件
-  const criticalComponents = [
-    '/src/components/DocumentEditor.jsx',
-    '/src/components/ChatPanel.jsx'
-  ]
+  // 只在开发环境中预加载源文件（生产环境中这些文件不存在）
+  if (process.env.NODE_ENV === 'development') {
+    // 预加载关键组件
+    const criticalComponents = [
+      '/src/components/DocumentEditor.jsx',
+      '/src/components/ChatPanel.jsx'
+    ]
+    
+    // 使用 link preload
+    criticalComponents.forEach(path => {
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'script'
+      link.href = path
+      document.head.appendChild(link)
+    })
+  }
   
-  // 使用 link preload
-  criticalComponents.forEach(path => {
-    const link = document.createElement('link')
-    link.rel = 'preload'
-    link.as = 'script'
-    link.href = path
-    document.head.appendChild(link)
-  })
-  
-  // 预连接 API 服务器
+  // 预连接 API 服务器（所有环境都需要）
   const apiServers = [
     'https://coding.dashscope.aliyuncs.com',
     'https://anyrouter.top'
