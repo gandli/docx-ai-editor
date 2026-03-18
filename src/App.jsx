@@ -1,5 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { AppShell } from './app/AppShell';
+import { runReviewSession } from './domains/review/services/review-orchestrator';
+import { parseFileToDocument } from './api/document-parser';
+import { defaultRules } from './domains/review/model/review-models';
+import { analyzeDocument } from './api/llm';
 import './App.css';
 
 /**
@@ -18,18 +22,44 @@ function App() {
     setIsProcessing(true);
     try {
       console.log('File uploaded:', file);
+      
+      // Parse the document into structured format with segments
+      const parsedDocument = await parseFileToDocument(file);
+      
+      // Update document state with parsed content
       setDocument({
+        ...parsedDocument,
         name: file.name,
         size: file.size,
         lastModified: file.lastModified,
-        // TODO: Add actual document content parsing
       });
+      
       // Clear previous findings when new document is uploaded
       setFindings([]);
       setSelectedFinding(null);
       setReport(null);
+      
+      // Now run the review session with the parsed document
+      console.log('Running review session...');
+      const reviewResult = await runReviewSession({
+        document: parsedDocument,
+        rules: defaultRules,
+        aiReviewer: async (doc) => {
+          // Use the analyzeDocument function to get AI review
+          const aiResponse = await analyzeDocument(file, '请审查此文档并指出任何问题或改进建议');
+          return aiResponse;
+        }
+      });
+      
+      console.log('Review completed:', reviewResult);
+      setFindings(reviewResult.findings);
+      
     } catch (error) {
-      console.error('File upload error:', error);
+      console.error('File upload or processing error:', error);
+      // Still clear findings on error but show error state if needed
+      setFindings([]);
+      setSelectedFinding(null);
+      setReport(null);
     } finally {
       setIsProcessing(false);
     }

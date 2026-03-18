@@ -141,3 +141,50 @@ export function createReviewReport({
     completedAt,
   };
 }
+
+/**
+ * Default rules for procurement document review
+ */
+export const defaultRules = [
+  {
+    id: 'budget-section-required',
+    checkType: 'required_presence',
+    target: 'section',
+    pattern: '预算',
+    severity: 'high',
+    message: '缺少预算部分',
+  },
+  {
+    id: 'vendor-section-required',
+    checkType: 'required_presence',
+    target: 'section',
+    pattern: '供应商',
+    severity: 'high',
+    message: '缺少供应商部分',
+  },
+  {
+    id: 'timeline-section-required',
+    checkType: 'required_presence',
+    target: 'section',
+    pattern: '时间安排',
+    severity: 'medium',
+    message: '缺少时间安排部分',
+  },
+  {
+    id: 'cost-analysis-required',
+    checkType: 'structure_check',
+    target: 'section_length',
+    sectionPattern: '成本分析',
+    minLength: 50,
+    severity: 'medium',
+    message: '成本分析部分太短',
+  },
+  {
+    id: 'approval-section-required',
+    checkType: 'required_presence',
+    target: 'section',
+    pattern: '审批',
+    severity: 'high',
+    message: '缺少审批部分',
+  },
+];
