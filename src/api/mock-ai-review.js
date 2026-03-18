@@ -20,7 +20,8 @@ export function generateMockFindings(document) {
 
   // Analyze document segments to generate relevant mock findings
   for (const segment of document.segments) {
-    if (!segment.text) continue;
+    // Ensure segment has valid text property before processing
+    if (!segment.text || typeof segment.text !== 'string') continue;
     
     const text = segment.text.toLowerCase();
     
@@ -33,13 +34,13 @@ export function generateMockFindings(document) {
         type: 'content_issue',
         severity: 'high',
         title: '预算相关内容可能需要补充',
-        description: `在 "${segment.text.substring(0, 50)}..." 段落中提到了预算相关的内容，建议详细说明预算分配和使用计划。`,
+        description: `在 "${segment.text?.substring(0, 50) || ''}..." 段落中提到了预算相关的内容，建议详细说明预算分配和使用计划。`,
         suggestions: [
           '明确列出具体金额',
           '添加预算合理性说明',
           '提供成本效益分析'
         ],
-        context: segment.text,
+        context: segment.text || '',
         status: 'open',
         category: 'completeness',
         priority: 2
@@ -53,13 +54,13 @@ export function generateMockFindings(document) {
         type: 'content_issue',
         severity: 'medium',
         title: '潜在问题描述需完善',
-        description: `段落 "${segment.text.substring(0, 50)}..." 中提到问题但缺乏具体解决方案。`,
+        description: `段落 "${segment.text?.substring(0, 50) || ''}..." 中提到问题但缺乏具体解决方案。`,
         suggestions: [
           '提供具体的解决步骤',
           '添加时间线规划',
           '指定负责人'
         ],
-        context: segment.text,
+        context: segment.text || '',
         status: 'open',
         category: 'clarity',
         priority: 1
@@ -67,7 +68,7 @@ export function generateMockFindings(document) {
     }
     
     // Check for very long paragraphs that might benefit from structuring
-    if (segment.text && segment.text.length > 300) {
+    if (segment.text && typeof segment.text === 'string' && segment.text.length > 300) {
       findings.push({
         id: `mock-${findingId++}`,
         type: 'structure_issue',
@@ -79,7 +80,7 @@ export function generateMockFindings(document) {
           '添加子标题',
           '使用列表形式呈现要点'
         ],
-        context: segment.text.substring(0, 100) + '...',
+        context: (segment.text?.substring(0, 100) || '') + '...',
         status: 'open',
         category: 'structure',
         priority: 0
@@ -87,19 +88,19 @@ export function generateMockFindings(document) {
     }
     
     // Check for incomplete sentences or fragments
-    if (segment.text && (segment.text.endsWith('...') || segment.text.match(/etc\.?$/))) {
+    if (segment.text && typeof segment.text === 'string' && (segment.text.endsWith('...') || segment.text.match(/etc\.?$/))) {
       findings.push({
         id: `mock-${findingId++}`,
         type: 'completeness_issue',
         severity: 'medium',
         title: '内容可能不完整',
-        description: `检测到不完整的表述 "${segment.text.substring(0, 50)}..."，建议补充完整信息。`,
+        description: `检测到不完整的表述 "${segment.text?.substring(0, 50) || ''}..."，建议补充完整信息。`,
         suggestions: [
           '完成未完的表述',
           '提供完整的信息',
           '删除模糊的结尾'
         ],
-        context: segment.text,
+        context: segment.text || '',
         status: 'open',
         category: 'completeness',
         priority: 1

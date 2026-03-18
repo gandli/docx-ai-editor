@@ -14,7 +14,7 @@ export function parseDocumentContent(textContent) {
   }
 
   // Split content into lines for processing
-  const lines = textContent.split('\n').map(line => line.trim()).filter(line => line.length > 0)
+  const lines = textContent ? textContent.split('\n').map(line => line.trim()).filter(line => line.length > 0) : []
   
   const segments = []
   let currentParagraph = ''
@@ -44,7 +44,7 @@ export function parseDocumentContent(textContent) {
         id: `seg-${segmentId++}`,
         type: 'heading',
         level: Math.min(headingLevel, 6), // Limit to h1-h6
-        text: headingText,
+        text: headingText || '', // Ensure text is never undefined
         position: segments.length
       })
     } 
@@ -64,7 +64,7 @@ export function parseDocumentContent(textContent) {
       segments.push({
         id: `seg-${segmentId++}`,
         type: 'list_item',
-        text: line,
+        text: line || '', // Ensure text is never undefined
         position: segments.length
       })
     }
@@ -83,7 +83,7 @@ export function parseDocumentContent(textContent) {
     segments.push({
       id: `seg-${segmentId++}`,
       type: 'paragraph',
-      text: currentParagraph.trim(),
+      text: currentParagraph.trim() || '', // Ensure text is never empty/undefined
       position: segments.length
     })
   }
@@ -101,11 +101,11 @@ export function parseDocumentWithMetadata(textContent) {
   
   // Calculate basic document metrics
   const wordCount = segments.reduce((count, segment) => {
-    return count + (segment.text?.split(/\s+/).length || 0)
+    return count + ((segment.text && typeof segment.text === 'string') ? segment.text.split(/\s+/).length : 0)
   }, 0)
   
   const charCount = segments.reduce((count, segment) => {
-    return count + (segment.text?.length || 0)
+    return count + ((segment.text && typeof segment.text === 'string') ? segment.text.length : 0)
   }, 0)
   
   const headingCount = segments.filter(segment => segment.type === 'heading').length
